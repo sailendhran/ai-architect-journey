@@ -91,3 +91,11 @@ python3 -c "from src.store import index_records; from src.ingest import ingest_f
 python3 src/rag.py "What is the policy on remote work?"
 python3 evals/run_eval.py
 ```
+
+## Results
+
+## It works — grounded answers with citations
+![Grounded answer over NZ AI strategy docs](./assets/rag-grounded-answer.png)
+
+## ...and it refuses when it shouldn't answer
+![Correct refusal on an out-of-context question](./assets/rag-refusal.png)
