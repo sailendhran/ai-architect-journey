@@ -7,7 +7,7 @@ Public log of building toward AI architecture consulting for NZ enterprises and 
 **Why this repo:** Working in public as I layer agentic AI, RAG, and AI governance expertise on top of an enterprise cloud foundation. Six-month build. Real artifacts, not summaries.
 
 ## Active work
-- Week 1: Production RAG on AWS Bedrock (Sydney region) [/]
+- Week 1: Production RAG on AWS Bedrock (Sydney region) :white_check_mark:
 
 ## Roadmap
 - Weeks 1–2: Production-grade RAG with hybrid search, re-ranking, ADRs
