@@ -2,7 +2,7 @@
 
 > A local, data-sovereign retrieval-augmented generation pipeline running entirely on an **NVIDIA DGX Spark (GB10)** — multimodal ingestion, IBM Granite models via Ollama, Langfuse tracing, and DeepEval evaluation. No cloud API; no document content leaves the machine.
 
-Part of my [**AI Architect journey**](../../) — this experiment builds a production-shaped RAG system end to end and adds the observability and evaluation layers that separate a prototype from something you could defend in a public-sector procurement.
+Part of my [**AI Architect journey**](../) — this experiment builds a production-shaped RAG system end to end and adds the observability and evaluation layers that separate a prototype from something you could defend in a public-sector procurement.
 
 ---
 
@@ -93,27 +93,27 @@ Real, public NZ government AI documents, including:
 ### RAG answering a grounded question
 <!-- A notebook cell showing a question, the answer, and the cited sources. -->
 ![RAG query with sources](docs/img/01-rag-query.png)
-_Placeholder — RAG answering an NZ AI policy question with source attribution._
+RAG answering an NZ AI policy question with source attribution._
 
 ### Langfuse trace (retrieval + generation spans)
 <!-- The Langfuse trace view for one query, expanded to show nested spans. -->
 ![Langfuse trace](docs/img/02-langfuse-trace.png)
-_Placeholder — a `rag-query` trace showing nested retrieval and generation spans with latency and token counts._
+a `rag-query` trace showing nested retrieval and generation spans with latency and token counts._
 
 ### DeepEval scores
 <!-- The eval summary output (Faithfulness / Answer Relevancy / Contextual metrics). -->
 ![DeepEval results](docs/img/03-deepeval-scores.png)
-_Placeholder — DeepEval metric scores across the golden question set._
+DeepEval metric scores across the golden question set._
 
 ### Generated PDF briefing
 <!-- A page or two of the sourced PDF report (table + chart + references). -->
 ![Generated report](docs/img/04-generated-report.png)
-_Placeholder — auto-generated, sourced PDF briefing with a data table and chart._
+auto-generated, sourced PDF briefing with a data table and chart._
 
 ### DGX Spark / `ollama list`
 <!-- Optional: terminal showing the models loaded locally on the Spark. -->
 ![Models on the Spark](docs/img/05-ollama-models.png)
-_Placeholder — Granite models served locally via Ollama on the DGX Spark._
+Granite models served locally via Ollama on the DGX Spark._
 
 ---
 

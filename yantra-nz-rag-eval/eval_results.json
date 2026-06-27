@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-27T21:37:26",
+  "generated_at": "2026-06-27T23:02:56",
   "threshold": 0.7,
   "results": [
     {
@@ -7,9 +7,9 @@
       "actual_output": "Based on the provided context, New Zealand's approach to responsible AI in the public service is underpinned by the following principles:\n\n1. **Alignment with OECD AI Principles**: Cabinet agreed in June 2024 that New Zealand's approach to adopting AI will be in accordance with the OECD AI Principles. These principles promote innovative, trustworthy AI that respects human rights and democratic values.\n\n2. **Responsible Development and Use**: The context emphasizes \"responsible development and use of AI in New Zealand\" to deliver better outcomes for people, boost productivity, contribute to economic prosperity, improve public services, meet government targets, and ensure the safety of the country and its people.\n\n3. **Encouragement of AI Adoption with Risk Management**: There is an agreement that \"government agencies should be encouraged to adopt AI for its benefits, while managing the risks.\" This suggests a balanced approach that promotes AI utilization but also emphasizes the importance of risk management.\n\n4. **Collaboration and Consistency**: The Government Chief Digital Officer (GCDO) is working with key agencies like the Ministry of Business Innovation and Employment (MBIE) and the Ministry of Statistics to ensure consistency, reduce duplication of effort, and align efforts across the public service.\n\n5. **Light-Touch and Principles-Based Approach**: New Zealand adopts a light-touch and principles-based approach to AI policy, leveraging existing regulatory frameworks (e.g., privacy, consumer protection, human rights) that are technology-neutral and can be updated as needed to address new risks and enable innovation.\n\nThese principles collectively guide the responsible development and deployment of AI within New Zealand's public service, ensuring alignment with international standards, fostering innovation while managing risks, and maintaining flexibility to adapt to technological advancements.",
       "scores": {
         "FaithfulnessMetric": {
-          "score": 1.0,
-          "reason": "The score is 1.00 because there are no contradictions; the actual output perfectly aligns with the retrieval context.",
-          "passed": true
+          "score": 0.0,
+          "reason": "The score is 0.00 because there are no contradictions present, indicating perfect alignment between the actual output and the retrieval context. Great job maintaining consistency!",
+          "passed": false
         },
         "AnswerRelevancyMetric": {
           "score": 1.0,
@@ -39,8 +39,8 @@
       "actual_output": "New Zealand's approach to AI explicitly incorporates Treaty of Waitangi obligations and M\u0101ori perspectives through several key measures:\n\n1. **Embedding Te Ao M\u0101ori Perspective**: The government commits to embedding a Te Ao M\u0101ori perspective in the development and use of algorithms, aligning with the principles of the Treaty of Waitangi. This ensures that AI systems are designed and implemented in a way that respects M\u0101ori values, rights, and interests.\n\n2. **Data Iwi Leaders' Group (DILG) Engagement**: The government has engaged with the DILG, which has shown readiness to embrace AI. This collaboration acknowledges the potential of AI to bring substantial improvements in services for M\u0101ori while addressing concerns about exclusion from AI benefits.\n\n3. **Respect for M\u0101ori Rights**: AI stakeholders (designers, developers, and users) are required to respect the rights of M\u0101ori as articulated in Te Tiriti o Waitangi. This is part of a broader commitment to uphold human rights, democratic values, and principles of equality and fairness in AI systems.\n\n4. **Alignment with OECD AI Principles**: By adopting the OECD AI Principles, New Zealand's AI approach promotes innovative, trustworthy AI that respects human rights and democratic values, which includes considerations for M\u0101ori perspectives and Treaty obligations.\n\nThese elements collectively ensure that New Zealand's AI policy is inclusive, equitable, and aligned with its constitutional and cultural commitments to M\u0101ori.",
       "scores": {
         "FaithfulnessMetric": {
-          "score": 0.875,
-          "reason": "The score is 0.88 because the actual output incorrectly asserts direct government engagement with the Data Iwi Leaders' Group (DILG), while the retrieval context only indicates DILG's readiness to adopt AI, without mentioning any specific interaction with the government.",
+          "score": 1.0,
+          "reason": "The score is 1.00 because there are no contradictions; the actual output perfectly aligns with the retrieval context.",
           "passed": true
         },
         "AnswerRelevancyMetric": {
@@ -72,7 +72,7 @@
       "scores": {
         "FaithfulnessMetric": {
           "score": 0.833,
-          "reason": "The score is 0.83 because the actual output fails to acknowledge the implied creation of a new advanced technology public research organisation (e.g., a 'New Zealand Institute for Advanced Technology') as part of reshaping New Zealand's Crown Research Institutes, despite this being clearly suggested in the retrieval context.",
+          "reason": "The score is 0.83 because the actual output incorrectly specifies the new advanced technology public research organisation as the 'New Zealand Institute for Advanced Technology,' while the retrieval context only mentions creating such an organisation without providing a specific name.",
           "passed": true
         },
         "AnswerRelevancyMetric": {
