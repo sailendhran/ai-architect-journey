@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data-Sovereign AI on a Desk — Yantra NZ</title>
+<meta name="description" content="How Yantra built a fully on-premises multimodal RAG system over New Zealand government AI policy documents — running entirely on an NVIDIA DGX Spark, with nothing leaving the machine.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0B2545;          /* Yantra deep navy */
+    --ink-soft:#28415c;
+    --accent:#13A89E;       /* teal */
+    --accent-deep:#0d7e76;
+    --paper:#F7F5F0;        /* warm off-white */
+    --paper-2:#EFEBE2;
+    --machine:#0A1622;      /* near-black "device" panel */
+    --machine-2:#11202f;
+    --line:#d8d2c6;
+    --grey:#5A6B7B;
+    --maxw:1080px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Source Serif 4",Georgia,serif;
+    font-size:19px;
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}
+  .mono{font-family:"JetBrains Mono",monospace}
+  .display{font-family:"Space Grotesk",sans-serif}
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    border-bottom:1px solid var(--line);
+    background:rgba(247,245,240,.85);
+    backdrop-filter:blur(8px);
+    position:sticky;top:0;z-index:20;
+  }
+  .topbar .wrap{display:flex;align-items:center;justify-content:space-between;height:62px}
+  .brand{font-family:"Space Grotesk",sans-serif;font-weight:700;letter-spacing:.14em;font-size:15px;text-transform:uppercase;color:var(--ink);text-decoration:none}
+  .brand span{color:var(--accent)}
+  .topbar nav a{font-family:"Space Grotesk",sans-serif;font-size:13px;color:var(--grey);text-decoration:none;margin-left:26px;letter-spacing:.02em}
+  .topbar nav a:hover{color:var(--accent-deep)}
+  @media(max-width:640px){.topbar nav{display:none}}
+
+  /* ---------- hero ---------- */
+  .hero{padding:64px 0 0}
+  .eyebrow{
+    font-family:"JetBrains Mono",monospace;font-size:12.5px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--accent-deep);margin-bottom:22px;
+    display:flex;align-items:center;gap:12px;
+  }
+  .eyebrow::before{content:"";width:34px;height:1px;background:var(--accent)}
+  h1.title{
+    font-family:"Space Grotesk",sans-serif;font-weight:700;
+    font-size:clamp(2.5rem,6.5vw,4.4rem);line-height:1.02;letter-spacing:-.02em;
+    color:var(--ink);max-width:14ch;
+  }
+  h1.title em{font-style:normal;color:var(--accent-deep)}
+  .standfirst{
+    font-size:clamp(1.1rem,2.4vw,1.4rem);color:var(--ink-soft);
+    margin-top:26px;max-width:60ch;line-height:1.5;
+  }
+  .byline{
+    margin-top:28px;padding-top:20px;border-top:1px solid var(--line);
+    font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--grey);
+    display:flex;flex-wrap:wrap;gap:8px 26px;
+  }
+  .byline b{color:var(--ink);font-weight:600}
+
+  /* ---------- the signature: perimeter panel ---------- */
+  .perimeter{
+    margin:54px 0 8px;background:var(--machine);
+    border-radius:14px;padding:34px 30px 30px;color:#cfe3e1;
+    position:relative;overflow:hidden;
+    box-shadow:0 30px 60px -28px rgba(11,37,69,.55);
+  }
+  .perimeter::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:
+      radial-gradient(120% 80% at 80% -10%, rgba(19,168,158,.16), transparent 60%);
+  }
+  .perimeter h2{
+    font-family:"JetBrains Mono",monospace;font-weight:500;font-size:12.5px;
+    letter-spacing:.16em;text-transform:uppercase;color:#6fb9b2;margin-bottom:24px;
+  }
+  .device-frame{
+    position:relative;border:1.5px dashed rgba(111,185,178,.5);border-radius:10px;
+    padding:26px 22px 22px;z-index:1;
+  }
+  .device-tag{
+    position:absolute;top:-11px;left:18px;background:var(--machine);
+    font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.1em;
+    color:var(--accent);padding:0 10px;text-transform:uppercase;
+  }
+  .perimeter-note{
+    position:absolute;bottom:-11px;right:18px;background:var(--machine);
+    font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.04em;
+    color:#8aa0ab;padding:0 10px;
+  }
+  /* pipeline flow */
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:10px}
+  .node{
+    flex:1 1 130px;background:var(--machine-2);border:1px solid rgba(111,185,178,.18);
+    border-radius:8px;padding:14px 14px;min-width:0;
+  }
+  .node .k{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#5f8a86;margin-bottom:7px}
+  .node .v{font-family:"Space Grotesk",sans-serif;font-size:15px;font-weight:600;color:#e8f3f1;line-height:1.25}
+  .node .s{font-family:"JetBrains Mono",monospace;font-size:11px;color:#7f97a2;margin-top:5px}
+  .arrow{display:flex;align-items:center;color:var(--accent);font-size:18px;flex:0 0 auto}
+  @media(max-width:680px){.arrow{display:none}.node{flex:1 1 100%}}
+  .watchers{
+    display:flex;gap:10px;margin-top:12px;
+  }
+  .watch{
+    flex:1;border:1px solid rgba(111,185,178,.18);border-radius:8px;padding:11px 14px;
+    background:linear-gradient(180deg,rgba(19,168,158,.06),transparent);
+  }
+  .watch .k{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#5f8a86}
+  .watch .v{font-family:"Space Grotesk",sans-serif;font-size:14px;font-weight:600;color:#cfe3e1;margin-top:3px}
+  @media(max-width:680px){.watchers{flex-direction:column}}
+
+  /* ---------- spec strip ---------- */
+  .spec{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);
+    border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:40px 0 8px;
+  }
+  .spec div{background:var(--paper);padding:20px 18px}
+  .spec .n{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:1.7rem;color:var(--ink);line-height:1}
+  .spec .l{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--grey);margin-top:8px}
+  @media(max-width:680px){.spec{grid-template-columns:repeat(2,1fr)}}
+
+  /* ---------- body sections ---------- */
+  section.body{padding:46px 0 0}
+  .kicker{
+    font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--accent-deep);margin-bottom:14px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .kicker .num{
+    font-weight:600;color:var(--ink);background:var(--paper-2);
+    border-radius:4px;padding:2px 8px;
+  }
+  h2.sec{
+    font-family:"Space Grotesk",sans-serif;font-weight:600;
+    font-size:clamp(1.6rem,3.6vw,2.3rem);letter-spacing:-.015em;
+    line-height:1.1;color:var(--ink);margin-bottom:18px;max-width:22ch;
+  }
+  .body p{margin-bottom:20px;max-width:68ch}
+  .body p .lead{font-weight:600}
+  .body a{color:var(--accent-deep);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+  .pull{
+    border-left:3px solid var(--accent);padding:6px 0 6px 22px;margin:30px 0;
+    font-size:1.32rem;line-height:1.45;color:var(--ink);font-weight:500;max-width:30ch;
+  }
+
+  /* screenshot figures */
+  figure{margin:34px 0}
+  .shot{
+    border:1px solid var(--line);border-radius:10px;background:var(--paper-2);
+    aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;
+    position:relative;overflow:hidden;
+  }
+  .shot img{width:100%;height:100%;object-fit:cover;display:block}
+  .shot .ph{
+    text-align:center;color:var(--grey);font-family:"JetBrains Mono",monospace;
+    font-size:12px;letter-spacing:.04em;padding:20px;
+  }
+  .shot .ph .icon{font-size:26px;color:var(--accent);display:block;margin-bottom:10px}
+  .shot[data-label]::before{
+    content:attr(data-label);position:absolute;top:12px;left:12px;
+    font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--accent-deep);background:var(--paper);
+    border:1px solid var(--line);border-radius:4px;padding:3px 8px;
+  }
+  figcaption{font-family:"JetBrains Mono",monospace;font-size:12.5px;color:var(--grey);margin-top:12px;line-height:1.5}
+
+  /* stack table */
+  .stack{width:100%;border-collapse:collapse;margin:26px 0;font-size:15.5px}
+  .stack td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  .stack tr td:first-child{
+    font-family:"JetBrains Mono",monospace;font-size:12.5px;color:var(--grey);
+    width:34%;letter-spacing:.02em;text-transform:uppercase;
+  }
+  .stack tr td:last-child{font-family:"Space Grotesk",sans-serif;font-weight:500;color:var(--ink)}
+
+  /* loop diagram */
+  .loop{
+    background:var(--paper-2);border:1px solid var(--line);border-radius:12px;
+    padding:28px 26px;margin:30px 0;
+  }
+  .loop-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:6px}
+  .loop-step{position:relative}
+  .loop-step .t{font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:15px;color:var(--ink);margin-bottom:4px}
+  .loop-step .d{font-size:14px;color:var(--ink-soft);line-height:1.45}
+  .loop-step .tag{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--accent-deep);letter-spacing:.06em;text-transform:uppercase}
+  @media(max-width:680px){.loop-steps{grid-template-columns:1fr}}
+
+  /* callout */
+  .callout{
+    background:var(--ink);color:#dce7f0;border-radius:12px;padding:28px 28px;margin:36px 0;
+  }
+  .callout .k{font-family:"JetBrains Mono",monospace;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+  .callout p{color:#cddae6;max-width:64ch;margin:0;font-size:17px}
+
+  /* ---------- CTA / footer ---------- */
+  .cta{
+    margin:56px 0 0;background:linear-gradient(135deg,var(--ink),#13314f);
+    border-radius:16px;padding:46px 36px;color:#fff;text-align:center;
+  }
+  .cta h3{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:clamp(1.5rem,3.4vw,2.1rem);margin-bottom:14px;letter-spacing:-.01em}
+  .cta p{color:#bcd0e0;max-width:52ch;margin:0 auto 26px}
+  .cta a{
+    display:inline-block;font-family:"Space Grotesk",sans-serif;font-weight:600;
+    background:var(--accent);color:#04211e;text-decoration:none;
+    padding:14px 30px;border-radius:8px;letter-spacing:.01em;
+    transition:transform .15s ease,background .15s ease;
+  }
+  .cta a:hover{background:#16c0b4;transform:translateY(-2px)}
+  footer{padding:46px 0;text-align:center;color:var(--grey);font-family:"JetBrains Mono",monospace;font-size:12.5px;letter-spacing:.03em}
+  footer a{color:var(--accent-deep);text-decoration:none}
+
+  /* reveal animation */
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}
+  .reveal.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+
+  :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:3px}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <a href="https://yantranz.com" class="brand">YANTRA<span>.</span>NZ</a>
+    <nav>
+      <a href="#approach">Approach</a>
+      <a href="#build">The build</a>
+      <a href="#evaluate">Evaluation</a>
+      <a href="#talk">Work with us</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- HERO -->
+  <div class="hero">
+    <div class="wrap">
+      <div class="eyebrow">Experiment · Data-sovereign AI</div>
+      <h1 class="title">An AI that reads government policy <em>without the data ever leaving the room.</em></h1>
+      <p class="standfirst">We built a multimodal retrieval system over New Zealand's public-sector AI documents — ingestion, reasoning, tracing, and evaluation — running end to end on a single desktop machine. No external API. No data residency question to answer, because the data never moves.</p>
+      <div class="byline">
+        <span><b>Yantra NZ</b> · Engineering note</span>
+        <span>Hardware: NVIDIA DGX Spark (GB10)</span>
+        <span>Stack: IBM Granite · Ollama · Langfuse · DeepEval</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIGNATURE: the perimeter -->
+  <div class="wrap">
+    <div class="perimeter reveal">
+      <h2>The whole system, inside one boundary</h2>
+      <div class="device-frame">
+        <span class="device-tag">DGX Spark · 128 GB unified memory</span>
+        <div class="flow">
+          <div class="node">
+            <div class="k">Ingest</div>
+            <div class="v">Parse &amp; caption</div>
+            <div class="s">Docling + Granite Vision</div>
+          </div>
+          <div class="arrow">→</div>
+          <div class="node">
+            <div class="k">Index</div>
+            <div class="v">Embed → store</div>
+            <div class="s">Granite multilingual · ChromaDB</div>
+          </div>
+          <div class="arrow">→</div>
+          <div class="node">
+            <div class="k">Retrieve</div>
+            <div class="v">Top-k context</div>
+            <div class="s">semantic search</div>
+          </div>
+          <div class="arrow">→</div>
+          <div class="node">
+            <div class="k">Generate</div>
+            <div class="v">Grounded answer</div>
+            <div class="s">Granite 4.1 30B</div>
+          </div>
+        </div>
+        <div class="watchers">
+          <div class="watch"><div class="k">Observe</div><div class="v">Langfuse — every trace, local</div></div>
+          <div class="watch"><div class="k">Evaluate</div><div class="v">DeepEval — local judge model</div></div>
+        </div>
+        <span class="perimeter-note">nothing crosses this line</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPEC STRIP -->
+  <div class="wrap">
+    <div class="spec reveal">
+      <div><div class="n">100%</div><div class="l">On-premises</div></div>
+      <div><div class="n">30B</div><div class="l">Local generation model</div></div>
+      <div><div class="n">0</div><div class="l">Bytes sent to cloud</div></div>
+      <div><div class="n">5</div><div class="l">NZ govt source docs</div></div>
+    </div>
+  </div>
+
+  <!-- WHY -->
+  <section class="body" id="approach">
+    <div class="wrap">
+      <div class="kicker reveal"><span class="num">01</span> Why we built it</div>
+      <h2 class="sec reveal">In the public sector, "where does the data go?" is the first question — and often the last.</h2>
+      <p class="reveal"><span class="lead">Generative AI is moving fast in New Zealand government, but most of the obvious tools route sensitive data through third-party clouds.</span> For agencies like Health NZ or a council handling residents' information, that single fact can stop a project before it starts. Data residency isn't a preference; it's frequently a procurement requirement.</p>
+      <p class="reveal">So we set ourselves a constraint and treated it as the design: build a capable, modern RAG system — multimodal ingestion, a large generation model, full observability, real evaluation — where <em>no document content ever leaves the machine</em>. If it works on a desktop, the data-residency conversation is over before it begins.</p>
+      <div class="pull reveal">If the answer never leaves the room, neither does the question.</div>
+    </div>
+  </section>
+
+  <!-- THE BUILD -->
+  <section class="body" id="build">
+    <div class="wrap">
+      <div class="kicker reveal"><span class="num">02</span> The build</div>
+      <h2 class="sec reveal">A full pipeline on a single GB10 desktop.</h2>
+      <p class="reveal">The corpus is real: New Zealand's Strategy for Artificial Intelligence, the Responsible AI Guidance for the Public Service, the Algorithm Charter, and supporting cabinet material. These are figure-heavy policy PDFs, so text-only ingestion would throw away half the meaning.</p>
+      <p class="reveal"><span class="lead">Docling</span> parses each document into text, tables, and images; a local <span class="lead">Granite vision model</span> describes the diagrams so they become searchable too. Everything is embedded with a <span class="lead">multilingual</span> Granite model — deliberately chosen so te reo Māori terms like Te Ao Māori and Treaty concepts retrieve correctly — and stored in ChromaDB. At query time, the most relevant passages are handed to <span class="lead">Granite 4.1 30B</span>, which answers grounded strictly in what was retrieved, and cites its sources.</p>
+
+      <table class="stack reveal">
+        <tr><td>Hardware</td><td>NVIDIA DGX Spark · GB10 · 128 GB unified memory</td></tr>
+        <tr><td>Model serving</td><td>Ollama (fully local)</td></tr>
+        <tr><td>Generation</td><td>IBM Granite 4.1 30B</td></tr>
+        <tr><td>Vision</td><td>IBM Granite 3.2 Vision</td></tr>
+        <tr><td>Embeddings</td><td>Granite multilingual (te reo Māori coverage)</td></tr>
+        <tr><td>Parsing · Store</td><td>Docling · ChromaDB</td></tr>
+        <tr><td>Observability</td><td>Langfuse (self-hosted)</td></tr>
+        <tr><td>Evaluation</td><td>DeepEval (local judge)</td></tr>
+      </table>
+
+      <figure class="reveal">
+        <div class="shot" data-label="Screenshot 01">
+          <img src="docs/img/01-rag-query.png" alt="RAG answering an NZ AI policy question with cited sources" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="ph" style="display:none"><span class="icon">▣</span>docs/img/01-rag-query.png<br>RAG answering a policy question, with sources</div>
+        </div>
+        <figcaption>The system answering a question on the NZ AI Strategy — grounded in retrieved passages and attributing each source document.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- OBSERVABILITY -->
+  <section class="body" id="observe">
+    <div class="wrap">
+      <div class="kicker reveal"><span class="num">03</span> Seeing inside</div>
+      <h2 class="sec reveal">A black box can't be trusted with public data. So we opened it.</h2>
+      <p class="reveal">Every query is traced in a <span class="lead">self-hosted Langfuse</span> dashboard — itself running on the same machine. Each trace breaks the query into its stages: what was asked, which documents came back and how fast, the exact prompt sent to the model, the answer, and token usage. When something looks wrong, the trace shows <em>which stage</em> was responsible.</p>
+
+      <figure class="reveal">
+        <div class="shot" data-label="Screenshot 02">
+          <img src="docs/img/02-langfuse-trace.png" alt="Langfuse trace showing retrieval and generation spans" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="ph" style="display:none"><span class="icon">▤</span>docs/img/02-langfuse-trace.png<br>Langfuse trace — retrieval + generation spans</div>
+        </div>
+        <figcaption>A single query in Langfuse — nested retrieval and generation spans, with latency and token counts, all logged locally.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- EVALUATION -->
+  <section class="body" id="evaluate">
+    <div class="wrap">
+      <div class="kicker reveal"><span class="num">04</span> Proving it works</div>
+      <h2 class="sec reveal">"It answers questions" is a demo. Scores make it a system.</h2>
+      <p class="reveal">We score answer quality with <span class="lead">DeepEval</span>, using the local Granite model as the judge — so even evaluation stays on-device. Two checks need no answer key: <span class="lead">Faithfulness</span> (does the answer stay within the retrieved context, or does it invent?) and <span class="lead">Answer Relevancy</span> (does it actually address the question?). With a curated set of known-good answers, two more kick in — <span class="lead">Contextual Recall</span> and <span class="lead">Precision</span> — which measure whether retrieval fetched the right material in the first place.</p>
+
+      <div class="loop reveal">
+        <div class="kicker" style="margin-bottom:16px"><span class="num">Loop</span> How the three layers work together</div>
+        <div class="loop-steps">
+          <div class="loop-step"><div class="tag">Diagnose</div><div class="t">Trace</div><div class="d">Langfuse shows exactly what each query did at every stage.</div></div>
+          <div class="loop-step"><div class="tag">Measure</div><div class="t">Evaluate</div><div class="d">DeepEval scores faithfulness, relevancy, and retrieval quality.</div></div>
+          <div class="loop-step"><div class="tag">Keep honest</div><div class="t">Goldens</div><div class="d">A fixed test set turns every change into a measurable regression check.</div></div>
+        </div>
+      </div>
+
+      <figure class="reveal">
+        <div class="shot" data-label="Screenshot 03">
+          <img src="docs/img/03-deepeval-scores.png" alt="DeepEval metric scores across the golden question set" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="ph" style="display:none"><span class="icon">▥</span>docs/img/03-deepeval-scores.png<br>DeepEval scores across the golden set</div>
+        </div>
+        <figcaption>DeepEval results — faithfulness and relevancy scored by a local judge model against a curated set of NZ-AI questions.</figcaption>
+      </figure>
+
+      <figure class="reveal">
+        <div class="shot" data-label="Screenshot 04">
+          <img src="docs/img/04-generated-report.png" alt="Auto-generated sourced PDF briefing with table and chart" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="ph" style="display:none"><span class="icon">▦</span>docs/img/04-generated-report.png<br>Auto-generated, sourced PDF briefing</div>
+        </div>
+        <figcaption>The pipeline also assembles sourced PDF briefings — narrative grounded in retrieved text, with tables and charts built only from figures extracted from the documents.</figcaption>
+      </figure>
+
+      <div class="callout reveal">
+        <div class="k">An honest caveat</div>
+        <p>The judge is itself a language model, so its scores are a strong signal — not gospel. That's exactly why a human-verified set of reference answers matters: it anchors the evaluation to answers a person actually checked, and keeps results comparable as the system changes.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAKEAWAY -->
+  <section class="body" id="takeaway">
+    <div class="wrap">
+      <div class="kicker reveal"><span class="num">05</span> What it means</div>
+      <h2 class="sec reveal">Data sovereignty stops being a compromise.</h2>
+      <p class="reveal">The usual trade-off — modern AI capability <em>or</em> keeping data in the country — turns out to be a false one. A single GB10 desktop runs a 30-billion-parameter model alongside a vision model, with tracing and evaluation, over real government documents, and never opens a connection to the outside world. For NZ agencies where residency is non-negotiable, that changes what's possible to procure.</p>
+      <p class="reveal">And it's reusable. Point the same pipeline at a different set of documents — a council's records, a health provider's policies, an agency's archive — and you have a grounded, auditable assistant over that corpus, running on hardware that fits under a desk.</p>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="wrap">
+    <div class="cta reveal" id="talk">
+      <h3>Exploring on-prem AI for sensitive data?</h3>
+      <p>Yantra builds data-sovereign AI systems for New Zealand's public sector and enterprise. If residency, auditability, and real evaluation matter to your project, let's talk.</p>
+      <a href="https://yantranz.com">Start a conversation →</a>
+    </div>
+  </div>
+
+  <footer>
+    <div class="wrap">
+      © <span id="yr"></span> Yantra NZ · <a href="https://yantranz.com">yantranz.com</a> · Data-sovereign AI for Aotearoa
+    </div>
+  </footer>
+</main>
+
+<script>
+  document.getElementById('yr').textContent = new Date().getFullYear();
+  // scroll reveal
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+  },{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
