@@ -1,0 +1,83 @@
+# Self-hosted Langfuse for local RAG tracing on the DGX Spark.
+# Traces stay entirely on this machine — nothing is sent to any cloud.
+#
+# Start:   docker compose -f docker-compose.langfuse.yml up -d
+# Open:    http://localhost:3000   (create a local account, then a project)
+# Stop:    docker compose -f docker-compose.langfuse.yml down
+#
+# After first login: create a project, copy its Public + Secret keys, and put them
+# in .env (see .env.example). Then the notebook's traced RAG will start emitting traces.
+#
+# NOTE: Langfuse v3 uses Postgres + Clickhouse + Redis + MinIO. This is the
+# official self-hosted topology. On the Spark (ARM64) the images are multi-arch.
+# If you prefer the simplest possible setup, pin to a Langfuse v2 image which needs
+# only Postgres — but v3 is current and recommended.
+
+services:
+  langfuse-web:
+    image: langfuse/langfuse:3
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: change-me-to-a-random-string
+      SALT: change-me-to-another-random-string
+      ENCRYPTION_KEY: 0000000000000000000000000000000000000000000000000000000000000000  # 64 hex chars; regenerate with: openssl rand -hex 32
+      CLICKHOUSE_URL: http://clickhouse:8123
+      CLICKHOUSE_USER: clickhouse
+      CLICKHOUSE_PASSWORD: clickhouse
+      REDIS_CONNECTION_STRING: redis://redis:6379
+      LANGFUSE_S3_EVENT_UPLOAD_BUCKET: langfuse
+      LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT: http://minio:9000
+      LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID: minio
+      LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY: miniosecret
+      LANGFUSE_S3_EVENT_UPLOAD_FORCE_PATH_STYLE: "true"
+      TELEMETRY_ENABLED: "false"            # keep it local; no phone-home
+      LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES: "false"
+
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - langfuse_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:24
+    restart: unless-stopped
+    environment:
+      CLICKHOUSE_USER: clickhouse
+      CLICKHOUSE_PASSWORD: clickhouse
+    volumes:
+      - langfuse_ch:/var/lib/clickhouse
+
+  redis:
+    image: redis:7
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: miniosecret
+    volumes:
+      - langfuse_minio:/data
+
+volumes:
+  langfuse_pg:
+  langfuse_ch:
+  langfuse_minio:

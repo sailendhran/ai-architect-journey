@@ -1,0 +1,116 @@
+# Golden question set for evaluating the NZ-govt-AI RAG.
+#
+# - `question`         : required. Used by both reference-free and golden-set eval.
+# - `expected_output`  : optional. Fill in a concise, source-grounded ideal answer
+#                        to unlock ContextualRecall / ContextualPrecision metrics.
+# - `notes`            : optional, for your own reference.
+#
+# Reference-free eval (Faithfulness, AnswerRelevancy) works with `question` alone.
+# Add expected_output over time — aim for ~50 well-curated goldens for stable metrics.
+#
+# Copy this file to goldens.yaml and edit. goldens.yaml is what the evaluator reads.
+
+goldens:
+  - question: "What principles underpin New Zealand's approach to responsible AI in the public service?"
+    expected_output: "New Zealand's public service approach to AI is grounded in the OECD AI
+    Principles, which Cabinet agreed to adopt in June 2024. These promote
+    inclusive growth and well-being; respect for human rights and democratic
+    values including fairness and privacy; transparency and explainability;
+    robustness, safety and security; and accountability. The Public Service
+    AI Framework adopts these values-based principles and organises activity
+    around pillars such as Governance, Guardrails, Capability, Innovation,
+    Social licence and Global voice. The OECD AI system lifecycle is used to
+    apply these principles across the planning, data, build and deployment
+    stages of any GenAI system."   # e.g. summarise the OECD-based principles the Framework adopts
+    notes: "Should reference OECD AI principles; sources: Public Service AI Framework."
+
+  - question: "How does NZ guidance treat the use of GenAI with sensitive or classified data?"
+    expected_output: "The guidance advises strong caution. When submitting government
+    information into a public GenAI system, the information must either
+    already be public or be acceptable to be made public — so sensitive or
+    classified data should not be entered into public GenAI tools. Agencies
+    are urged to apply strict access controls and avoid exposing sensitive
+    government data to external AI models. The Privacy Act 2020 applies, and
+    robust risk assessments and privacy impact assessments (PIAs) should be
+    undertaken at all stages when personal information is involved. Some
+    systems support sensitivity labels to control what content can be used.
+    Agencies may publish information about their AI use for transparency,
+    barring reasonable exceptions such as classified use cases."
+    notes: "Guidance advises against GenAI for sensitive-or-above classified data."
+
+  - question: "How are Treaty of Waitangi obligations and Māori perspectives reflected in NZ's AI approach?"
+    expected_output: "Treaty of Waitangi obligations and Māori perspectives are reflected across
+    New Zealand's AI approach. The Public Service AI Framework is explicitly
+    positioned within New Zealand's legal and policy ecosystem, referencing and
+    aligning to Treaty of Waitangi obligations alongside statutes such as the
+    Privacy Act 2020 and Public Service Act 2020. Its Social licence pillar
+    emphasises public engagement, Māori partnership and addressing inequities.
+    The Algorithm Charter for Aotearoa New Zealand commits signatory agencies
+    to embedding a Te Ao Māori perspective in the development and use of
+    algorithms consistent with the principles of the Treaty. Māori data
+    sovereignty and engagement with Māori are recurring themes, though
+    commentary notes Māori involvement is still developing."
+    notes: "Algorithm Charter Te Ao Māori commitment; engagement with iwi/Māori."
+
+  - question: "What does the strategy say about AI adoption rates among New Zealand businesses?"
+    expected_output: "New Zealand's Strategy for Artificial Intelligence frames AI adoption as
+    an economic opportunity, estimating that generative AI alone could add
+    around $76 billion to the New Zealand economy by 2038 — roughly 15 percent
+    of GDP. The strategy notes that AI uptake among New Zealand businesses has
+    lagged comparable economies, and deliberately emphasises AI adoption and
+    application rather than foundational AI development. It identifies barriers
+    to uptake, including uncertainty about how existing laws apply to AI and a
+    shortage of people with AI expertise, and positions greater business use of
+    AI as a central goal."
+    notes: "Large NZ business AI use rose 48% (2023) to 67% (2024)."
+
+  - question: "What is the New Zealand Institute for Advanced Technology and what is its purpose?"
+    expected_output: "The New Zealand Institute for Advanced Technology (NZIAT) is a new public
+    research organisation, incubated within MBIE, established as part of major
+    reforms to New Zealand's science, innovation and technology system. Through
+    the AI Strategy, the Government is investing up to $70 million over seven
+    years via NZIAT to support innovative AI research, applications and
+    commercialisation, develop world-class expertise, and strengthen New
+    Zealand's competitive edge. Its AI Research Platform aims to advance
+    internationally leading-edge AI research, create productive
+    knowledge-intensive firms, and open new market possibilities, with funding
+    beginning in 2026."
+    notes: "~NZD 231m initiative (2025-2029) to commercialise advanced tech incl. AI."
+
+  - question: "Who is the responsible official for an agency's GenAI use, and what are their duties?"
+    expected_output: "Each agency has a designated responsible official accountable for its
+    GenAI use. Their duties include establishing the agency's guidance or
+    rules on appropriate GenAI use; engaging in all-of-government AI forums
+    and processes and keeping up to date with evolving requirements; and
+    acting as the central contact point in the agency, coordinating with the
+    Government Chief Digital Officer (GCDO) on matters such as technology
+    procurement to ensure GenAI tools are secure, high quality and properly
+    supported over time. The role supports clear oversight and governance so
+    that AI use is safe, responsible and ethical."
+    notes: "Governance section of the Responsible AI Guidance: GenAI."
+
+  - question: "How does the guidance address misinformation and hallucinations from GenAI?"
+    expected_output: "The guidance warns that generative AI can produce "hallucinations" —
+    fabricated outputs that appear credible but lack factual basis — and can
+    generate misleading, harmful or biased results. To manage this it
+    emphasises a human-in-the-loop approach, where human oversight is
+    integrated across GenAI use and humans remain essential to decision-making.
+    Users must understand the data they provide and check and agree with the
+    outputs; AI-generated content should be verified through trusted sources,
+    reviewed by colleagues as a quality check, and confirmed as accurate and
+    culturally appropriate before publication. Higher-risk uses should be
+    subject to more extensive oversight and the agency's risk and assurance
+    framework."
+    notes: "Foundational matters in the public-service GenAI guidance."
+
+  - question: "What does the Responsible AI Guidance for Businesses recommend about risk management?"
+    expected_output: "The Responsible AI Guidance for Businesses encourages organisations to
+    adopt AI in a way that balances opportunity with proportionate risk
+    management, taking a risk-based approach where higher-risk uses receive
+    greater scrutiny and oversight. It recommends assessing potential risks and
+    benefits before adopting AI, putting human oversight and accountability in
+    place, protecting privacy and personal information in line with the Privacy
+    Act 2020, and being transparent about AI use. It points businesses to
+    practical tools, including a risk management plan worksheet, to help
+    identify, assess and mitigate AI-related risks across the AI lifecycle."
+    notes: "References business.govt.nz risk management plan worksheet."

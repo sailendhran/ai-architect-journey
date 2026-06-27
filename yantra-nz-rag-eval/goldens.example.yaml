@@ -1,0 +1,44 @@
+# Golden question set for evaluating the NZ-govt-AI RAG.
+#
+# - `question`         : required. Used by both reference-free and golden-set eval.
+# - `expected_output`  : optional. Fill in a concise, source-grounded ideal answer
+#                        to unlock ContextualRecall / ContextualPrecision metrics.
+# - `notes`            : optional, for your own reference.
+#
+# Reference-free eval (Faithfulness, AnswerRelevancy) works with `question` alone.
+# Add expected_output over time — aim for ~50 well-curated goldens for stable metrics.
+#
+# Copy this file to goldens.yaml and edit. goldens.yaml is what the evaluator reads.
+
+goldens:
+  - question: "What principles underpin New Zealand's approach to responsible AI in the public service?"
+    expected_output: ""   # e.g. summarise the OECD-based principles the Framework adopts
+    notes: "Should reference OECD AI principles; sources: Public Service AI Framework."
+
+  - question: "How does NZ guidance treat the use of GenAI with sensitive or classified data?"
+    expected_output: ""
+    notes: "Guidance advises against GenAI for sensitive-or-above classified data."
+
+  - question: "How are Treaty of Waitangi obligations and Māori perspectives reflected in NZ's AI approach?"
+    expected_output: ""
+    notes: "Algorithm Charter Te Ao Māori commitment; engagement with iwi/Māori."
+
+  - question: "What does the strategy say about AI adoption rates among New Zealand businesses?"
+    expected_output: ""
+    notes: "Large NZ business AI use rose 48% (2023) to 67% (2024)."
+
+  - question: "What is the New Zealand Institute for Advanced Technology and what is its purpose?"
+    expected_output: ""
+    notes: "~NZD 231m initiative (2025-2029) to commercialise advanced tech incl. AI."
+
+  - question: "Who is the responsible official for an agency's GenAI use, and what are their duties?"
+    expected_output: ""
+    notes: "Governance section of the Responsible AI Guidance: GenAI."
+
+  - question: "How does the guidance address misinformation and hallucinations from GenAI?"
+    expected_output: ""
+    notes: "Foundational matters in the public-service GenAI guidance."
+
+  - question: "What does the Responsible AI Guidance for Businesses recommend about risk management?"
+    expected_output: ""
+    notes: "References business.govt.nz risk management plan worksheet."
