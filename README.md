@@ -2,7 +2,7 @@
 
 Public log of building toward AI architecture consulting for NZ enterprises and government.
 
-**Background:** 18+ years in cloud architecture, SRE, and platform engineering across AWS, GCP, and Azure. AWS Solutions Architect — Professional, CKA, Terraform Associate. Currently consulting at ASB Bank (Wellington, NZ).
+**Background:** 18+ years in cloud architecture, SRE, and platform engineering across AWS, GCP, and Azure. AWS Solutions Architect — Professional, CKA, Terraform Associate.
 
 **Why this repo:** Working in public as I layer agentic AI, RAG, and AI governance expertise on top of an enterprise cloud foundation. Six-month build. Real artifacts, not summaries.
 
